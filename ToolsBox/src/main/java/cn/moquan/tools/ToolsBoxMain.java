@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ToolsBoxMain {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToolsBoxMain.class);
+    private static final Logger logger = LoggerFactory.getLogger(ToolsBoxMain.class);
     
     public static void main(String[] args) {
-        LOGGER.info("Welcome to ToolsBox!");
+        logger.info("Welcome to ToolsBox!");
     }
 }

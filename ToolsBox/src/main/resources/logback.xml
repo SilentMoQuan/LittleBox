@@ -3,7 +3,7 @@
 
 <configuration>
 
-    <appender name="console">
+    <appender name="console"  class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-DD HH:mm:ss.SSS} [%thread] %-5level %logger  -%kvp- %msg%n</pattern>
         </encoder>

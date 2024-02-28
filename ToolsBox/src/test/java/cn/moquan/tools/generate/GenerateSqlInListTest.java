@@ -17,8 +17,6 @@ class GenerateSqlInListTest {
 
     @Test
     void generate() {
-
-        generator.generate();
-
+        assertDoesNotThrow(generator::generate);
     }
 }

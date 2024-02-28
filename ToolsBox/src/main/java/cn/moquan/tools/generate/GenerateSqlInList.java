@@ -34,7 +34,7 @@ public class GenerateSqlInList {
                 new InputStreamReader(Files.newInputStream(ancillaryFile.toPath()))
         )) {
 
-            String line = null;
+            String line;
             StringBuilder builder = new StringBuilder();
 
             // 处理文件

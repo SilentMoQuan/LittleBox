@@ -11,6 +11,10 @@ import java.util.Locale;
  */
 public class StringUtil {
 
+    private StringUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static <T> String toStringFormat(T target){
         return toStringFormat(target.toString());
     }

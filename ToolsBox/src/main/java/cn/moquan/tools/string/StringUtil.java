@@ -206,4 +206,27 @@ public class StringUtil {
 
         return result;
     }
+
+    public static String stackTraceElementFormat(){
+        return stackTraceElementFormat(Thread.currentThread().getStackTrace());
+    }
+
+    public static String stackTraceElementFormat(StackTraceElement[] stackArr){
+
+        StringBuilder builder = new StringBuilder("\n");
+        builder.append("\t").append("########## ThreadStackTrance ##############").append("\n");
+
+        for (StackTraceElement element : stackArr) {
+
+            builder.append("\t")
+                    .append(element.getClassName())
+                    .append(".")
+                    .append(element.getMethodName())
+                    .append("(").append(element.getFileName()).append(":").append(element.getLineNumber()).append(")")
+                    .append("\n");
+
+        }
+        builder.append("\t").append("########## ThreadStackTrance End ##########").append("\n");
+        return builder.toString();
+    }
 }

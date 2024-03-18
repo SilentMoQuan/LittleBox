@@ -5,9 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Stream 工具
@@ -24,6 +27,12 @@ public class StreamUtil {
         throw new IllegalStateException("Utility class");
     }
 
+    private static <T> BinaryOperator<T> throwingMerger() {
+        return (u, v) -> {
+            throw new IllegalStateException(String.format("Duplicate key %s", u));
+        };
+    }
+
     public static <E, V> List<V> toList(Collection<E> collection, Function<E, V> func) {
 
         Objects.requireNonNull(func);
@@ -33,6 +42,7 @@ public class StreamUtil {
 
         return collection.stream()
                 .map(func)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -46,6 +56,7 @@ public class StreamUtil {
         return collection.stream()
                 .map(func)
                 .flatMap(Collection::stream)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -59,6 +70,7 @@ public class StreamUtil {
         return collection.stream()
                 .map(func)
                 .distinct()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -71,6 +83,7 @@ public class StreamUtil {
 
         return collection.stream()
                 .map(func)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -84,7 +97,23 @@ public class StreamUtil {
         return collection.stream()
                 .map(func)
                 .flatMap(Collection::stream)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+    }
+
+    public static <E, K, V> Map<K, V> toMap(Collection<E> collection,
+                                            Function<E, K> keyFunc,
+                                            Function<E, V> valueFunc) {
+
+        Objects.requireNonNull(keyFunc);
+        Objects.requireNonNull(valueFunc);
+
+        if (null == collection || collection.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return collection.stream()
+                .collect(Collectors.toMap(keyFunc, valueFunc, throwingMerger()));
     }
 
     public static <E, K, V> Map<K, V> toMap(Collection<E> collection,
@@ -112,6 +141,28 @@ public class StreamUtil {
 
         return collection.stream()
                 .collect(Collectors.groupingBy(func));
+    }
+
+    public static <K, E> Map<K, Long> groupByKeyLongCount(Collection<E> collection, Function<E, K> func) {
+
+        Objects.requireNonNull(func);
+        if (null == collection || collection.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return collection.stream()
+                .collect(Collectors.groupingBy(func, Collectors.reducing(0L, e -> 1L, Long::sum)));
+    }
+
+    public static <K, E> Map<K, Integer> groupByKeyIntegerCount(Collection<E> collection, Function<E, K> func) {
+
+        Objects.requireNonNull(func);
+        if (null == collection || collection.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return collection.stream()
+                .collect(Collectors.groupingBy(func, Collectors.reducing(0, e -> 1, Integer::sum)));
     }
 
     public static <K, E> Map<K, Set<E>> groupByKeyToSet(Collection<E> collection, Function<E, K> func) {
@@ -185,7 +236,37 @@ public class StreamUtil {
 
         String firstFormat = StringUtil.toStringFormat(first);
         String secondFormat = StringUtil.toStringFormat(second);
-        LOGGER.warn("出现同key冲突, firstValue: {}, secondValue: {}", firstFormat, secondFormat);
+        String stackTranceFormat = StringUtil.stackTraceElementFormat();
+        LOGGER.warn("出现同key冲突, \nfirstValue: {}, \nsecondValue: {} \nStackTrance: {}", firstFormat, secondFormat, stackTranceFormat);
         return second;
     }
+
+    @SuppressWarnings("unchack")
+    public static <T> BinaryOperator<T> chooseSecond() {
+        //log
+        return (first, second) -> {
+            String firstFormat = StringUtil.toStringFormat(first);
+            String secondFormat = StringUtil.toStringFormat(second);
+            String stackTranceFormat = StringUtil.stackTraceElementFormat();
+            LOGGER.warn("出现同key冲突, \nfirstValue: {}, \nsecondValue: {} \nStackTrance: {}", firstFormat, secondFormat, stackTranceFormat);
+            return second;
+        };
+    }
+
+    @SuppressWarnings("unchack")
+    public static <T> T chooseSecondNoWarning(T first, T second) {
+        //log
+        return second;
+    }
+
+    @SuppressWarnings("unchack")
+    public static <T> BinaryOperator<T> chooseSecondNoWarning() {
+        //log
+        return (first, second) -> second;
+    }
+
+    public static <T, R> R stream(Collection<T> collection, Function<Stream<T>, R> function) {
+        return function.apply(collection.stream());
+    }
+
 }

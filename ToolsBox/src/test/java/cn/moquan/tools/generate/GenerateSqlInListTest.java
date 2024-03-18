@@ -1,5 +1,6 @@
 package cn.moquan.tools.generate;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,14 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * <br />
  *
  * @author :<b> wangYuanHong </b><br />
- * @date :<b> 2024/2/28 14:44 </b><br />
  */
 class GenerateSqlInListTest {
 
     private final GenerateSqlInList generator = new GenerateSqlInList();
 
     @Test
+    @DisplayName("生成相关的文本内容")
     void generate() {
         assertDoesNotThrow(generator::generate);
     }
+
 }

@@ -3,6 +3,7 @@ package cn.moquan.tools.lock;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,11 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 分组锁
- * todo 需要添加删除队列
  * <br />
  *
  * @author :<b> wangYuanHong </b><br />
- * @date :<b> 2024/3/16 16:16 </b><br />
  */
 public class GroupLock<T> {
 
@@ -31,19 +30,19 @@ public class GroupLock<T> {
             }
     );
 
-    private final Map<T, ReentrantLock> map = new ConcurrentHashMap<>();
+    private final Map<T, GroupLockContext> map = new ConcurrentHashMap<>();
 
     public void lock(T key) throws Exception {
         keyCheck(key);
-        ReentrantLock lock = map.computeIfAbsent(key, keyItem -> new ReentrantLock());
-        lock.lock();
+        GroupLockContext groupLockContext = map.computeIfAbsent(key, keyItem -> GroupLockContext.init());
+        groupLockContext.lock();
     }
 
     public void unlock(T key) {
         keyCheck(key);
-        ReentrantLock lock = map.getOrDefault(key, null);
-        if (Objects.nonNull(lock)) {
-            lock.unlock();
+        GroupLockContext groupLockContext = map.getOrDefault(key, null);
+        if (Objects.nonNull(groupLockContext)) {
+            groupLockContext.unlock();
         }
     }
 
@@ -67,7 +66,15 @@ public class GroupLock<T> {
 
     public void delayRemove(T key, long time, TimeUnit unit, ScheduledThreadPoolExecutor threadPool) {
         keyCheck(key);
-        threadPool.schedule(() -> remove(key), time, unit);
+        ScheduledFuture<?> future = threadPool.schedule(() -> remove(key), time, unit);
+        GroupLockContext groupLockContext = map.getOrDefault(key, null);
+        if (Objects.isNull(groupLockContext)) {
+            // 数据已经被删除, 取消任务
+            future.cancel(true);
+        } else {
+            // 数据存在, 替换旧延时删除
+            groupLockContext.setDelayRemoveFuture(future);
+        }
     }
 
     public void unlockAndRemove(T key) {
@@ -78,7 +85,8 @@ public class GroupLock<T> {
 
     public ReentrantLock getLock(T key) {
         keyCheck(key);
-        return map.getOrDefault(key, null);
+        GroupLockContext groupLockContext = map.getOrDefault(key, null);
+        return Objects.isNull(groupLockContext) ? null : groupLockContext.getLock();
     }
 
     public void keyCheck(T key) {

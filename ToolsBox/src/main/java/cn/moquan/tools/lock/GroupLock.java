@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * todo 添加测试内容进行测试
+ * 分组锁
  * <br />
  *
  * @author :<b> wangYuanHong </b><br />
@@ -52,12 +52,12 @@ public class GroupLock<T> {
     }
 
     public void delayRemove(T key, long delayMilliSeconds, ScheduledThreadPoolExecutor threadPool) {
-        delayRemove(key, delayMilliSeconds, TimeUnit.SECONDS, threadPool);
+        delayRemove(key, delayMilliSeconds, TimeUnit.MILLISECONDS, threadPool);
     }
 
 
     public void delayRemove(T key, long delayMilliSeconds) {
-        delayRemove(key, delayMilliSeconds, TimeUnit.SECONDS, DEFAULT_SCHEDULED_THREAD_POOL);
+        delayRemove(key, delayMilliSeconds, TimeUnit.MILLISECONDS, DEFAULT_SCHEDULED_THREAD_POOL);
     }
 
     public void delayRemove(T key, long time, TimeUnit unit) {

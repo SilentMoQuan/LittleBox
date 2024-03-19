@@ -2,10 +2,7 @@ package cn.moquan.tools.lock;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,7 +18,7 @@ public class GroupLock<T> {
 
     private static final Integer CORE_THREAD_COUNT = 1000;
 
-    private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULED_THREAD_POOL = new ScheduledThreadPoolExecutor(
+    private static final ScheduledExecutorService DEFAULT_SCHEDULED_THREAD_POOL = new ScheduledThreadPoolExecutor(
             CORE_THREAD_COUNT,
             runnable -> {
                 Thread thread = new Thread(runnable);
@@ -64,7 +61,7 @@ public class GroupLock<T> {
         delayRemove(key, time, unit, DEFAULT_SCHEDULED_THREAD_POOL);
     }
 
-    public void delayRemove(T key, long time, TimeUnit unit, ScheduledThreadPoolExecutor threadPool) {
+    public void delayRemove(T key, long time, TimeUnit unit, ScheduledExecutorService threadPool) {
         keyCheck(key);
         ScheduledFuture<?> future = threadPool.schedule(() -> remove(key), time, unit);
         GroupLockContext groupLockContext = map.getOrDefault(key, null);

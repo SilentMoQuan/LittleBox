@@ -1,5 +1,7 @@
 package cn.moquan.tools.modbus;
 
+import java.util.Objects;
+
 /**
  *  CRC计算方法：
  *      1.预置1个16位的寄存器为十六进制FFFF(即全为1);称此寄存器为CRC寄存器;
@@ -16,9 +18,13 @@ package cn.moquan.tools.modbus;
  */
 public class CRC {
 
-    public String getCRC16(String source) {
-
-        source = source.substring(0, source.length() - 4);
+    /**
+     * 计算字符的 crc 16 的结果
+     *
+     * @param source 原文
+     * @return String 计算结果
+     */
+    public String calculateCRC16(String source) {
 
         String[] _0xStrArray = source.split("(?<=\\G[0-9A-Z]{2})");
 
@@ -39,6 +45,11 @@ public class CRC {
         }
 
         return Integer.toHexString(((crc & 0x00ff) << 8) + ((crc & 0xff00) >>> 8));
+    }
+
+    public boolean checkCRC16(String source){
+        String originCRC = source.substring(source.length() - 4);
+        return Objects.equals(originCRC, calculateCRC16(source.substring(0, source.length() - 4)));
     }
 
 }

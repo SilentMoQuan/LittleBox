@@ -44,7 +44,12 @@ public class CRC {
 
         }
 
-        return Integer.toHexString(((crc & 0x00ff) << 8) + ((crc & 0xff00) >>> 8));
+        String result = Integer.toHexString(((crc & 0x00ff) << 8) + ((crc & 0xff00) >>> 8));
+        if (result.length() < 2){
+            result = "0" + result;
+        }
+
+        return result;
     }
 
     public boolean checkCRC16(String source){

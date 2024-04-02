@@ -16,7 +16,10 @@ class CRCTest {
     @Test
     void getCRC16() {
 //         assertEquals("c5cd", crc.getCRC16("01030000000AC5CD"));
-        String crc16 = crc.calculateCRC16("010300480002441d");
-        System.out.println(crc16);
+        String command = "A10501010101";
+        String crc16 = crc.calculateCRC16(command);
+
+        System.out.println(command + crc16);
     }
 }
+

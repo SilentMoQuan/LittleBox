@@ -25,6 +25,22 @@ public class CustomNettyDecodeMessageHandler extends ByteToMessageDecoder implem
 
     private static final Logger logger = LoggerFactory.getLogger(CustomNettyDecodeMessageHandler.class);
 
+    /**
+     * 消息解码
+     * 1. 数据最短长度问题
+     * 2. 数据内容异常问题(数据长度信息异常导致的数据读取失败)
+     * 3. 数据CRC校验失败问题
+     * 4. 数据半包处理
+     * 5. 数据粘包处理
+     * 6. 消息转码
+     * 注意:
+     * 1. 不要使用绝对位置进行数据获取, 尤其是调用 ByteBuf.getByte(int); 接口, 其获取的是绝对地址
+     * 2. 慎用 ByteBuf.resetReaderIndex() 接口, 在循环解码处理半包问题时, 重置读指针会造成重读问题
+     *
+     * @param ctx
+     * @param in
+     * @param out
+     */
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 
         // 消息长度 < 魔数长度的均为半包

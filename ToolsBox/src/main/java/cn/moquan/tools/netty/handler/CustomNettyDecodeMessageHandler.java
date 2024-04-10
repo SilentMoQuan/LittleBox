@@ -2,6 +2,7 @@ package cn.moquan.tools.netty.handler;
 
 import cn.moquan.tools.core.Assert;
 import cn.moquan.tools.log.Log;
+import cn.moquan.tools.modbus.CRC;
 import cn.moquan.tools.netty.NettyConstant;
 import cn.moquan.tools.netty.NettyServerBaseException;
 import cn.moquan.tools.string.StringUtil;
@@ -24,6 +25,8 @@ import java.util.Objects;
 public class CustomNettyDecodeMessageHandler extends ByteToMessageDecoder implements Log {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomNettyDecodeMessageHandler.class);
+
+    private static final CRC CRC_UTIL = new CRC();
 
     /**
      * 消息解码
@@ -52,10 +55,7 @@ public class CustomNettyDecodeMessageHandler extends ByteToMessageDecoder implem
 
         int oldLen = in.readableBytes();
 
-        boolean isEnd = false;
-        if ("A1".equals(address) || "01".equals(address)) {
-            isEnd = NettyHandlerHolder.getByType(DeviceTypeEnum.MASTER_CONTROLLER).messageDecode(ctx, in, out);
-        }
+        boolean isEnd = messageDecoder(in, out);
 
         if (isEnd) {
             debug("decode msg : {}", out.toString());
@@ -65,6 +65,40 @@ public class CustomNettyDecodeMessageHandler extends ByteToMessageDecoder implem
             error("消息处理异常, 即将引发 netty 读取错误异常");
         }
 
+    }
+
+    private boolean messageDecoder(ByteBuf in, List<Object> out) {
+
+        do {
+            in.markReaderIndex();
+            int readableLen = in.readableBytes();
+            if (readableLen < NettyConstant.CUSTOM_PROTOCOL_MIN_BYTE_LEN) {
+                return false;
+            }
+
+            byte[] dataLenBuff = new byte[2];
+            in.readBytes(dataLenBuff, 8, 2);
+            int dataLen = dataLenBuff[0] << 8 + dataLenBuff[1];
+
+            in.resetReaderIndex();
+            int completeMessageLen = 8 + 4 + 4 + 4 + dataLen + 4;
+            if (readableLen < completeMessageLen){
+                return false;
+            }
+
+            byte[] buff = new byte[completeMessageLen];
+            in.readBytes(buff);
+
+            String msg = StringUtil.bytesToHexString(buff);
+            if (!CRC_UTIL.checkCRC16(msg)) {
+                // discard
+                return true;
+            }
+            out.add(msg);
+
+        } while (0 == in.readableBytes());
+
+        return true;
     }
 
     private void protocolCheck(ByteBuf in) {

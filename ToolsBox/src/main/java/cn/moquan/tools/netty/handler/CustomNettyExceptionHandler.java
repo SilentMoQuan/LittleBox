@@ -3,9 +3,7 @@ package cn.moquan.tools.netty.handler;
 import cn.moquan.tools.log.Log;
 import cn.moquan.tools.netty.tool.NettyUtil;
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.EventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

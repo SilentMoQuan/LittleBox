@@ -1,0 +1,7 @@
+协议格式: AAAAAAAA BBBB CCCC DDDD EE..EE FFFF
+AAAAAAAA: 8 Hex, 魔数, 用来识别当前协议, 当前协议使用: 04121012 作为魔数
+BBBB    : 4 Hex, 高位在前, 低位在后, 地址
+CCCC    : 4 Hex, 高位在前, 低位在后, 功能码
+DDDD    : 4 Hex, 高位在前, 低位在后, 数据长度
+EE..EE  : N Hex, 高位在前, 低位在后, 数据
+FFFF    : 4 Hex, CRC16 校验位

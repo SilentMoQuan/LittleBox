@@ -9,16 +9,9 @@ import cn.moquan.miot.entity.statistics.GetUserStatistics;
 import cn.moquan.miot.tool.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tool.MiotUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,37 +26,14 @@ public class ApiTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MIotApplication.class);
 
-    private static final String userName;
-    private static final String password;
-
-    static {
-        ClassLoader classLoader = ApiTest.class.getClassLoader();
-        URL access = classLoader.getResource("../classes/xiaomiAccess");
-        try {
-            File file = new File(access.toURI());
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-
-            userName = reader.readLine();
-            password = reader.readLine();
-
-            logger.debug("userName: {}", userName);
-            logger.debug("password: {}", password);
-        } catch (URISyntaxException | IOException e) {
-            throw new RuntimeException("读取账号密码文件失败.");
-        }
-    }
-
     public static void main(String[] args) {
         logger.info("Hello miot!\n");
 
-        Date from = Date.from(Instant.ofEpochSecond(1721750400));
-        System.out.println(from);
+        MIotCline cline = MiotUtil.getClient();
 
-        MIotCline cline = testLogin();
+//        cline.userDevices();
 
-        cline.userDevices();
-
-//        testDeviceList(cline);
+        testDeviceList(cline);
 
 //        testSetProperty(cline);
 
@@ -96,12 +66,6 @@ public class ApiTest {
         String homeList = cline.listHome();
         String format = StringUtil.toStringFormat(homeList);
         debug("device list", format);
-    }
-
-
-    public static MIotCline testLogin() {
-        // login
-        return MIotCline.connect(userName, password);
     }
 
     public static void testDeviceList(MIotCline cline) {

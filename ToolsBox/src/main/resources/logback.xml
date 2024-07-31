@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE configuration>
+
+<configuration>
+
+    <appender name="console"  class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-DD HH:mm:ss.SSS} [%thread] %-5level %logger  -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 总体控制 -->
+    <root level="DEBUG">
+        <appender-ref ref="console" />
+    </root>
+
+</configuration>

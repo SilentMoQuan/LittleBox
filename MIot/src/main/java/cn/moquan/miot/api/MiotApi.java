@@ -350,6 +350,76 @@ public class MiotApi implements SimpleLog {
     }
 
     /**
+     * 获取设备登陆
+     *
+     * @return String json String
+     */
+    public String getDeviceAuth(String did) {
+
+        String uri = "/user/get_device_auth";
+        String url = SERVICE + uri;
+
+        // 参数
+        Map<String, Object> prarmMap = new HashMap<>();
+        prarmMap.put("did", did);
+
+        // 计算摘要
+        prarmMap = signData(uri, JSONUtil.toJsonStr(prarmMap), basicInfo.ssecurity());
+
+        return sendPost(url, prarmMap);
+    }
+
+    /**
+     * 获取信息
+     *
+     * @return String json String
+     */
+    public String deviceInfo(String did) {
+
+        String uri = "/device/deviceinfo";
+        String url = SERVICE + uri;
+
+        // 参数
+        Map<String, Object> prarmMap = new HashMap<>();
+        prarmMap.put("did", did);
+
+        // 计算摘要
+        prarmMap = signData(uri, JSONUtil.toJsonStr(prarmMap), basicInfo.ssecurity());
+
+        return sendPost(url, prarmMap);
+    }
+
+    /**
+     * 获取信息
+     *
+     * @return String json String
+     */
+    public String deviceListPage(String did) {
+        String uri = "/v2/home/device_list_page";
+        String url = SERVICE + uri;
+
+        // 参数
+        Map<String, Object> prarmMap = new HashMap<>();
+        prarmMap.put("did", did);
+//        prarmMap.put("ssid", "XKZN01");
+//        prarmMap.put("bssid", "04:A1:51:9A:13:D2");
+        prarmMap.put("getVirtualModel", true);
+        prarmMap.put("getHuamiDevices", 1);
+        prarmMap.put("get_split_device", true);
+        prarmMap.put("support_smart_home", true);
+        prarmMap.put("get_cariot_device", true);
+        prarmMap.put("get_third_device", true);
+        prarmMap.put("start_did", "");
+        prarmMap.put("limit", null);
+
+        // 计算摘要
+        prarmMap = signData(uri, JSONUtil.toJsonStr(prarmMap), basicInfo.ssecurity());
+
+        return sendPost(url, prarmMap);
+    }
+
+
+    /**
      * 获取当前用户下的房间列表
      *
      * @return String json String

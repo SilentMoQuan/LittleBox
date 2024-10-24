@@ -29,8 +29,8 @@ public enum TimeWheelTickEnum {
         return slotCount;
     }
 
-    public TimeWheel initTimeWheel() {
-        return new TimeWheel(this);
-    }
+//    public TimeWheel initTimeWheel() {
+//        return new TimeWheel(this);
+//    }
 
 }

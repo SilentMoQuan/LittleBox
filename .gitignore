@@ -1,4 +1,4 @@
 out/
-/MIot/target/
+*/target/
 /.idea
 MIot/src/main/resources/xiaomiAccess

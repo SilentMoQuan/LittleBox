@@ -1,0 +1,11 @@
+spring:
+  neo4j:
+    uri: neo4j://192.168.7.94:7687
+    authentication:
+      username: spring
+      password: useNeo4j
+  application:
+    name: neo4j-demo
+
+server:
+  port: 7777
